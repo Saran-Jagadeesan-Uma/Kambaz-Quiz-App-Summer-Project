@@ -29,12 +29,15 @@ export interface Quiz {
   webcamRequired?: boolean;
   lockQuestionsAfterAnswering?: boolean;
   questions?: string[];
+  score?: number; 
 }
+
 
 export const findAllQuizzes = async (): Promise<Quiz[]> => {
   const { data } = await axiosWithCredentials.get(QUIZZES_URL);
   return data;
 };
+
 
 export const findQuizzesForCourse = async (cid: string): Promise<Quiz[]> => {
   const { data } = await axiosWithCredentials.get(
@@ -43,10 +46,12 @@ export const findQuizzesForCourse = async (cid: string): Promise<Quiz[]> => {
   return data;
 };
 
+
 export const findQuizById = async (qid: string): Promise<Quiz> => {
   const { data } = await axiosWithCredentials.get(`${QUIZZES_URL}/${qid}`);
   return data;
 };
+
 
 export const createQuiz = async (cid: string, quiz: Quiz): Promise<Quiz> => {
   const { data } = await axiosWithCredentials.post(
@@ -56,7 +61,11 @@ export const createQuiz = async (cid: string, quiz: Quiz): Promise<Quiz> => {
   return data;
 };
 
-export const updateQuiz = async (qid: string, quiz: Quiz): Promise<any> => {
+
+export const updateQuiz = async (
+  qid: string,
+  quiz: Partial<Quiz>
+): Promise<Quiz> => {
   const { data } = await axiosWithCredentials.put(
     `${QUIZZES_URL}/${qid}`,
     quiz
@@ -64,7 +73,7 @@ export const updateQuiz = async (qid: string, quiz: Quiz): Promise<any> => {
   return data;
 };
 
-export const deleteQuiz = async (qid: string): Promise<any> => {
-  const { data } = await axiosWithCredentials.delete(`${QUIZZES_URL}/${qid}`);
-  return data;
+
+export const deleteQuiz = async (qid: string): Promise<void> => {
+  await axiosWithCredentials.delete(`${QUIZZES_URL}/${qid}`);
 };
