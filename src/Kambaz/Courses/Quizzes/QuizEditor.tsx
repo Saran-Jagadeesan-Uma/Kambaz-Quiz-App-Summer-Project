@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import * as client from "./client";
+import QuizQuestions from "./Questions/questions";
 import {
   Form,
   Button,
@@ -261,8 +262,9 @@ export default function QuizEditor() {
         </Tab>
 
         <Tab eventKey="questions" title="Questions">
-          <p className="mt-3">Questions Editor Coming Soon</p>
+          <QuizQuestions quizId={quizId!} />
         </Tab>
+
       </Tabs>
 
       <div className="d-flex gap-2 mt-3">
