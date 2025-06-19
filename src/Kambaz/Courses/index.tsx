@@ -9,6 +9,7 @@ import Quizzes from "./Quizzes";
 import QuizEditor from "./Quizzes/QuizEditor";
 import { FaAlignJustify } from "react-icons/fa";
 import QuizDetails from "./Quizzes/QuizDetials";
+import QuizPreview from "./Quizzes/preview";
 
 export default function Courses({ courses }: { courses: any[] }) {
   const { cid } = useParams();
@@ -35,6 +36,7 @@ export default function Courses({ courses }: { courses: any[] }) {
             <Route path="Assignments/:aid" element={<AssignmentEditor />} />
             <Route path="Quizzes" element={<Quizzes />} />
             <Route path="Quizzes/:quizId/edit" element={<QuizEditor />} />
+            <Route path="Quizzes/:quizId/preview" element={<QuizPreview />} />
             <Route path="People" element={<People />} />
             <Route path="Quizzes/:quizId" element={<QuizDetails />} />
           </Routes>
