@@ -45,20 +45,27 @@ export default function QuizEditor() {
     setQuiz((prev) => ({ ...prev, [field]: value }));
   };
 
-  const save = async (publish: boolean = false) => {
-    if (!cid) return;
-    try {
-      const payload = { ...quiz, published: publish || quiz.published };
-      if (isNew) {
-        await client.createQuiz(cid, payload);
-      } else {
-        await client.updateQuiz(quizId!, payload);
-      }
-      navigate(`/Kambaz/Courses/${cid}/Quizzes`);
-    } catch (err) {
-      console.error("Error saving quiz:", err);
+const save = async (publish: boolean = false) => {
+  if (!cid) return;
+  try {
+    const { questions, ...quizWithoutQuestions } = quiz;
+    const payload = {
+      ...quizWithoutQuestions,
+      published: publish || quiz.published,
+    };
+
+    if (isNew) {
+      await client.createQuiz(cid, payload);
+    } else {
+      await client.updateQuiz(quizId!, payload);  // no question overwrite
     }
-  };
+
+    navigate(`/Kambaz/Courses/${cid}/Quizzes`);
+  } catch (err) {
+    console.error("Error saving quiz:", err);
+  }
+};
+
 
   const cancel = () => navigate(`/Kambaz/Courses/${cid}/Quizzes`);
 
