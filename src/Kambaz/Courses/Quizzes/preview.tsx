@@ -25,6 +25,7 @@ export default function QuizPreview() {
   const [answers, setAnswers] = useState<Record<string, any>>({});
   const [submitted, setSubmitted] = useState(false);
   const [score, setScore] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
     const load = async () => {
@@ -80,6 +81,71 @@ export default function QuizPreview() {
 
   if (!quiz) return <p>Loading quiz...</p>;
 
+  const renderQuestion = (q: Question, idx: number) => (
+    <Card className="mb-3" key={q._id}>
+      <Card.Body>
+        <h5>
+          {idx + 1}. {q.title}
+        </h5>
+        <p>
+          <i>{q.text}</i>
+        </p>
+        <p>
+          <b>{q.points} points</b>
+        </p>
+
+        {q.type === "Multiple Choice" && q.choices && (
+          <Form>
+            {q.choices.map((choice, i) => (
+              <Form.Check
+                type="radio"
+                key={i}
+                name={`q-${q._id}`}
+                label={choice}
+                value={choice}
+                disabled={submitted}
+                checked={answers[q._id] === choice}
+                onChange={(e) => handleAnswerChange(q._id, e.target.value)}
+              />
+            ))}
+          </Form>
+        )}
+
+        {q.type === "True/False" && (
+          <Form>
+            <Form.Check
+              type="radio"
+              label="True"
+              name={`q-${q._id}`}
+              disabled={submitted}
+              checked={answers[q._id] === true}
+              onChange={() => handleAnswerChange(q._id, true)}
+            />
+            <Form.Check
+              type="radio"
+              label="False"
+              name={`q-${q._id}`}
+              disabled={submitted}
+              checked={answers[q._id] === false}
+              onChange={() => handleAnswerChange(q._id, false)}
+            />
+          </Form>
+        )}
+
+        {q.type === "Fill in the Blank" && (
+          <Form.Control
+            type="text"
+            value={answers[q._id] || ""}
+            disabled={submitted}
+            onChange={(e) => handleAnswerChange(q._id, e.target.value)}
+          />
+        )}
+
+        {submitted && <p className="mt-2">{getFeedback(q)}</p>}
+      </Card.Body>
+    </Card>
+  );
+
   return (
     <div className="p-4">
       <div className="d-flex justify-content-between align-items-center mb-3">
@@ -104,75 +170,41 @@ export default function QuizPreview() {
         </Alert>
       )}
 
-      {questions.map((q, idx) => (
-        <Card className="mb-3" key={q._id}>
-          <Card.Body>
-            <h5>
-              {idx + 1}. {q.title}
-            </h5>
-            <p>
-              <i>{q.text}</i>
-            </p>
-            <p>
-              <b>{q.points} points</b>
-            </p>
-
-            {q.type === "Multiple Choice" && q.choices && (
-              <Form>
-                {q.choices.map((choice, i) => (
-                  <Form.Check
-                    type="radio"
-                    key={i}
-                    name={`q-${q._id}`}
-                    label={choice}
-                    value={choice}
-                    disabled={submitted}
-                    checked={answers[q._id] === choice}
-                    onChange={(e) => handleAnswerChange(q._id, e.target.value)}
-                  />
-                ))}
-              </Form>
+      {questions.length === 0 ? (
+        <Alert variant="warning">No questions in this quiz.</Alert>
+      ) : quiz.oneQuestionAtATime ? (
+        <>
+          {renderQuestion(questions[currentIndex], currentIndex)}
+          <div className="d-flex justify-content-between">
+            <Button
+              variant="secondary"
+              disabled={currentIndex === 0}
+              onClick={() => setCurrentIndex((i) => i - 1)}
+            >
+              Previous
+            </Button>
+            {currentIndex < questions.length - 1 ? (
+              <Button onClick={() => setCurrentIndex((i) => i + 1)}>
+                Next
+              </Button>
+            ) : (
+              !submitted && (
+                <Button variant="success" onClick={handleSubmit}>
+                  Submit Preview
+                </Button>
+              )
             )}
-
-            {q.type === "True/False" && (
-              <Form>
-                <Form.Check
-                  type="radio"
-                  label="True"
-                  name={`q-${q._id}`}
-                  disabled={submitted}
-                  checked={answers[q._id] === true}
-                  onChange={() => handleAnswerChange(q._id, true)}
-                />
-                <Form.Check
-                  type="radio"
-                  label="False"
-                  name={`q-${q._id}`}
-                  disabled={submitted}
-                  checked={answers[q._id] === false}
-                  onChange={() => handleAnswerChange(q._id, false)}
-                />
-              </Form>
-            )}
-
-            {q.type === "Fill in the Blank" && (
-              <Form.Control
-                type="text"
-                value={answers[q._id] || ""}
-                disabled={submitted}
-                onChange={(e) => handleAnswerChange(q._id, e.target.value)}
-              />
-            )}
-
-            {submitted && <p className="mt-2">{getFeedback(q)}</p>}
-          </Card.Body>
-        </Card>
-      ))}
-
-      {!submitted && (
-        <Button variant="success" onClick={handleSubmit}>
-          Submit Preview
-        </Button>
+          </div>
+        </>
+      ) : (
+        <>
+          {questions.map(renderQuestion)}
+          {!submitted && (
+            <Button variant="success" onClick={handleSubmit}>
+              Submit Preview
+            </Button>
+          )}
+        </>
       )}
     </div>
   );
