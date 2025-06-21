@@ -20,11 +20,13 @@ export default function Quizzes() {
   const [quizzes, setQuizzes] = useState<client.Quiz[]>([]);
   const { currentUser } = useSelector((state: any) => state.accountReducer);
   const isStudent = currentUser?.role === "STUDENT";
+  const isFaculty = currentUser?.role === "FACULTY";
 
   const fetchQuizzes = async () => {
     if (courseId) {
       const data = await client.findQuizzesForCourse(courseId);
-      setQuizzes(data);
+      const filtered = isStudent ? data.filter((q) => q.published) : data;
+      setQuizzes(filtered);
     }
   };
 
@@ -52,20 +54,28 @@ export default function Quizzes() {
     const from = quiz.availableFrom ? new Date(quiz.availableFrom) : null;
     const until = quiz.availableUntil ? new Date(quiz.availableUntil) : null;
 
-    if (from && now < from) {
-      return `Not available until ${from.toLocaleDateString()}`;
-    }
-    if (until && now > until) {
-      return "Closed";
-    }
-    if (from && until && now >= from && now <= until) {
-      return "Available";
-    }
+    if (from && now < from) return `Not available until ${from.toLocaleDateString()}`;
+    if (until && now > until) return "Closed";
+    if (from && until && now >= from && now <= until) return "Available";
     return "Availability unknown";
   };
 
   const formatDate = (date?: string) =>
     date ? new Date(date).toLocaleDateString() : "N/A";
+
+  const handleStudentQuizClick = (quiz: client.Quiz) => {
+    const now = new Date();
+    const availableFrom = quiz.availableFrom ? new Date(quiz.availableFrom) : null;
+
+    if (availableFrom && now < availableFrom) {
+      const diffDays = Math.ceil(
+        (availableFrom.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
+      );
+      alert(`This quiz will open in ${diffDays} day(s).`);
+    } else {
+      navigate(`/Kambaz/Courses/${courseId}/Quizzes/${quiz._id}`);
+    }
+  };
 
   useEffect(() => {
     fetchQuizzes();
@@ -75,14 +85,14 @@ export default function Quizzes() {
     <div className="p-4">
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h3>Quizzes</h3>
-        <button
-          className="btn btn-success"
-          onClick={() =>
-            navigate(`/Kambaz/Courses/${courseId}/Quizzes/new/edit`)
-          }
-        >
-          + Add Quiz
-        </button>
+        {isFaculty && (
+          <button
+            className="btn btn-success"
+            onClick={() => navigate(`/Kambaz/Courses/${courseId}/Quizzes/new/edit`)}
+          >
+            + Add Quiz
+          </button>
+        )}
       </div>
 
       <ListGroup className="rounded-0">
@@ -97,7 +107,7 @@ export default function Quizzes() {
           <ListGroup className="wd-lessons rounded-0">
             {quizzes.length === 0 ? (
               <ListGroup.Item className="p-3 text-muted">
-                No quizzes yet. Click "+ Add Quiz".
+                No quizzes yet. {isFaculty && '+ Add Quiz to begin.'}
               </ListGroup.Item>
             ) : (
               quizzes.map((quiz) => (
@@ -105,79 +115,77 @@ export default function Quizzes() {
                   <Row className="align-items-center">
                     <Col md={1} className="d-flex align-items-center">
                       <BsGripVertical className="me-2 fs-3" />
-                      <HiOutlinePencilAlt className="me-2 fs-3 text-success" />
+                      {isFaculty && (
+                        <HiOutlinePencilAlt className="me-2 fs-3 text-success" />
+                      )}
                     </Col>
                     <Col md={9}>
                       <b
                         className="d-block text-primary text-decoration-none"
                         role="button"
                         onClick={() =>
-                          navigate(
-                            `/Kambaz/Courses/${courseId}/Quizzes/${quiz._id}`
-                          )
+                          isStudent
+                            ? handleStudentQuizClick(quiz)
+                            : navigate(`/Kambaz/Courses/${courseId}/Quizzes/${quiz._id}`)
                         }
                       >
                         {quiz.title}
                       </b>
                       <div className="text-secondary small">
-                        {getAvailability(quiz)} | Due {formatDate(quiz.dueDate)}{" "}
-                        | {quiz.points} pts | {quiz.questions?.length ?? 0}{" "}
-                        questions
-                        {isStudent && quiz.score !== undefined
-                          ? ` | Score: ${quiz.score}`
-                          : ""}
+                        {getAvailability(quiz)} | Due {formatDate(quiz.dueDate)} |{" "}
+                        {quiz.points} pts | {quiz.questions?.length ?? 0} questions
                       </div>
                     </Col>
-                    <Col
-                      md={2}
-                      className="text-end d-flex align-items-center justify-content-end"
-                    >
-                      {quiz.published ? (
-                        <OverlayTrigger
-                          placement="top"
-                          overlay={<Tooltip>Published</Tooltip>}
-                        >
-                          <HiCheckCircle
-                            className="me-3 text-success fs-4"
-                            role="button"
-                            onClick={() => togglePublish(quiz)}
-                          />
-                        </OverlayTrigger>
-                      ) : (
-                        <OverlayTrigger
-                          placement="top"
-                          overlay={<Tooltip>Unpublished</Tooltip>}
-                        >
-                          <span
-                            role="button"
-                            className="me-3 fs-4"
-                            onClick={() => togglePublish(quiz)}
+                    {isFaculty && (
+                      <Col
+                        md={2}
+                        className="text-end d-flex align-items-center justify-content-end"
+                      >
+                        {quiz.published ? (
+                          <OverlayTrigger
+                            placement="top"
+                            overlay={<Tooltip>Published</Tooltip>}
                           >
-                            🚫
-                          </span>
-                        </OverlayTrigger>
-                      )}
+                            <HiCheckCircle
+                              className="me-3 text-success fs-4"
+                              role="button"
+                              onClick={() => togglePublish(quiz)}
+                            />
+                          </OverlayTrigger>
+                        ) : (
+                          <OverlayTrigger
+                            placement="top"
+                            overlay={<Tooltip>Unpublished</Tooltip>}
+                          >
+                            <span
+                              role="button"
+                              className="me-3 fs-4"
+                              onClick={() => togglePublish(quiz)}
+                            >
+                              🚫
+                            </span>
+                          </OverlayTrigger>
+                        )}
 
-                      <Dropdown as={ButtonGroup}>
-                        <Dropdown.Toggle variant="light">
-                          <BsThreeDotsVertical />
-                        </Dropdown.Toggle>
-                        <Dropdown.Menu>
-                          <Dropdown.Item
-                            onClick={() =>
-                              navigate(
-                                `/Kambaz/Courses/${courseId}/Quizzes/${quiz._id}/edit`
-                              )
-                            }
-                          >
-                            Edit
-                          </Dropdown.Item>
-                          <Dropdown.Item onClick={() => remove(quiz._id!)}>
-                            Delete
-                          </Dropdown.Item>
-                        </Dropdown.Menu>
-                      </Dropdown>
-                    </Col>
+                        <Dropdown as={ButtonGroup}>
+                          <Dropdown.Toggle variant="light">
+                            <BsThreeDotsVertical />
+                          </Dropdown.Toggle>
+                          <Dropdown.Menu>
+                            <Dropdown.Item
+                              onClick={() =>
+                                navigate(`/Kambaz/Courses/${courseId}/Quizzes/${quiz._id}/edit`)
+                              }
+                            >
+                              Edit
+                            </Dropdown.Item>
+                            <Dropdown.Item onClick={() => remove(quiz._id!)}>
+                              Delete
+                            </Dropdown.Item>
+                          </Dropdown.Menu>
+                        </Dropdown>
+                      </Col>
+                    )}
                   </Row>
                 </ListGroup.Item>
               ))

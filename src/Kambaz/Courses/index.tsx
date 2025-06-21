@@ -8,7 +8,7 @@ import People from "./People";
 import Quizzes from "./Quizzes";
 import QuizEditor from "./Quizzes/QuizEditor";
 import { FaAlignJustify } from "react-icons/fa";
-import QuizDetails from "./Quizzes/QuizDetials";
+import QuizDetails from "./Quizzes/QuizDetails";
 import QuizPreview from "./Quizzes/preview";
 import QuizTake from "./Quizzes/QuizTake";
 
