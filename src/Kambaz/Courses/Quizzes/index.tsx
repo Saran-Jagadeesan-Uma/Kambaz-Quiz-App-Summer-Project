@@ -35,11 +35,16 @@ export default function Quizzes() {
 
   const togglePublish = async (quiz: client.Quiz) => {
     if (!quiz._id) return;
-    await client.updateQuiz(quiz._id, {
-      ...quiz,
-      published: !quiz.published,
-    });
-    await fetchQuizzes();
+    try {
+      const updatedQuiz: client.Quiz = {
+        ...quiz,
+        published: !quiz.published,
+      };
+      await client.updateQuiz(quiz._id, updatedQuiz);
+      await fetchQuizzes();
+    } catch (err) {
+      console.error("Failed to toggle publish status:", err);
+    }
   };
 
   const getAvailability = (quiz: client.Quiz) => {
@@ -74,7 +79,7 @@ export default function Quizzes() {
           className="btn btn-success"
           onClick={() =>
             navigate(`/Kambaz/Courses/${courseId}/Quizzes/new/edit`)
-                    }
+          }
         >
           + Add Quiz
         </button>
@@ -107,7 +112,7 @@ export default function Quizzes() {
                         className="d-block text-primary text-decoration-none"
                         role="button"
                         onClick={() =>
-                        navigate(`/Kambaz/Courses/${courseId}/Quizzes/${quiz._id}`)
+                          navigate(`/Kambaz/Courses/${courseId}/Quizzes/${quiz._id}`)
                         }
                       >
                         {quiz.title}
@@ -129,7 +134,11 @@ export default function Quizzes() {
                           placement="top"
                           overlay={<Tooltip>Published</Tooltip>}
                         >
-                          <HiCheckCircle className="me-3 text-success fs-4" />
+                          <HiCheckCircle
+                            className="me-3 text-success fs-4"
+                            role="button"
+                            onClick={() => togglePublish(quiz)}
+                          />
                         </OverlayTrigger>
                       ) : (
                         <OverlayTrigger

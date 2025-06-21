@@ -102,7 +102,7 @@ export default function QuizDetails() {
             Start Quiz
           </Button>
         )}
-      </div>
+      </div>  
     </div>
   );
 }
