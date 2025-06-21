@@ -93,7 +93,8 @@ export default function QuizTake() {
             correct = selected === q.correctAnswer;
           } else {
             correct = (q.correctAnswer as string[])?.some(
-              (a: string) => a.toLowerCase().trim() === selected?.toLowerCase().trim()
+              (a: string) =>
+                a.toLowerCase().trim() === selected?.toLowerCase().trim()
             );
           }
 
@@ -104,11 +105,16 @@ export default function QuizTake() {
                   {q.title} — {correct ? "✔️" : "❌"}
                 </Card.Title>
                 <Card.Text>{q.text}</Card.Text>
-                <p><b>Your Answer:</b> {selected?.toString()}</p>
+                <p>
+                  <b>Your Answer:</b> {selected?.toString()}
+                </p>
                 {!correct && (
-                  <p><b>Correct Answer:</b> {Array.isArray(q.correctAnswer)
-                    ? q.correctAnswer.join(", ")
-                    : q.correctAnswer?.toString()}</p>
+                  <p>
+                    <b>Correct Answer:</b>{" "}
+                    {Array.isArray(q.correctAnswer)
+                      ? q.correctAnswer.join(", ")
+                      : q.correctAnswer?.toString()}
+                  </p>
                 )}
               </Card.Body>
             </Card>
@@ -121,23 +127,26 @@ export default function QuizTake() {
   return (
     <div>
       <h4>Take Quiz: {quiz.title}</h4>
-      {attemptsLeft <= 0 && <Alert variant="danger">You have no attempts left.</Alert>}
+      {attemptsLeft <= 0 && (
+        <Alert variant="danger">You have no attempts left.</Alert>
+      )}
       {questions.map((q) => (
         <Card key={q._id} className="mb-3">
           <Card.Body>
             <Card.Title>{q.title}</Card.Title>
             <Card.Text>{q.text}</Card.Text>
 
-            {q.type === "Multiple Choice" && q.choices?.map((c, idx) => (
-              <Form.Check
-                key={idx}
-                type="radio"
-                name={q._id}
-                label={c}
-                checked={answers[q._id] === c}
-                onChange={() => handleChange(q._id, c)}
-              />
-            ))}
+            {q.type === "Multiple Choice" &&
+              q.choices?.map((c, idx) => (
+                <Form.Check
+                  key={idx}
+                  type="radio"
+                  name={q._id}
+                  label={c}
+                  checked={answers[q._id] === c}
+                  onChange={() => handleChange(q._id, c)}
+                />
+              ))}
 
             {q.type === "True/False" && (
               <>

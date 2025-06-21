@@ -37,7 +37,10 @@ const QuizQuestions: React.FC<{ quizId: string }> = ({ quizId }) => {
     const fetchQuestions = async () => {
       try {
         const data = await questionClient.findQuestionsForQuiz(quizId);
-        const loadedQuestions = data.map((q: any) => ({ ...q, isEditing: false }));
+        const loadedQuestions = data.map((q: any) => ({
+          ...q,
+          isEditing: false,
+        }));
         setQuestions(loadedQuestions);
       } catch (error) {
         console.error("Error loading questions:", error);
@@ -52,14 +55,21 @@ const QuizQuestions: React.FC<{ quizId: string }> = ({ quizId }) => {
     setQuestions((prev) => [...prev, defaultNewQuestion(quizId)]);
   };
 
-  const updateQuestion = (id: string | undefined, updatedFields: Partial<Question>) => {
+  const updateQuestion = (
+    id: string | undefined,
+    updatedFields: Partial<Question>
+  ) => {
     setQuestions((prev) =>
-      prev.map((q) => (q._id === id || (!q._id && q.isNew) ? { ...q, ...updatedFields } : q))
+      prev.map((q) =>
+        q._id === id || (!q._id && q.isNew) ? { ...q, ...updatedFields } : q
+      )
     );
   };
 
   const cancelEdit = (id: string | undefined) => {
-    setQuestions((prev) => prev.filter((q) => !(q._id === id || (!q._id && q.isNew))));
+    setQuestions((prev) =>
+      prev.filter((q) => !(q._id === id || (!q._id && q.isNew)))
+    );
   };
 
   const deleteQuestion = async (question: Question) => {
@@ -74,25 +84,23 @@ const QuizQuestions: React.FC<{ quizId: string }> = ({ quizId }) => {
   };
 
   const saveEdit = async (question: Question) => {
-  try {
-    let savedQuestion;
+    try {
+      let savedQuestion;
 
-    if (question.isNew) {
-      savedQuestion = await questionClient.createQuestion(quizId, question);
-    } else {
-      savedQuestion = await questionClient.updateQuestion(question);
+      if (question.isNew) {
+        savedQuestion = await questionClient.createQuestion(quizId, question);
+      } else {
+        savedQuestion = await questionClient.updateQuestion(question);
+      }
+
+      setQuestions((prev) => {
+        const filtered = prev.filter((q) => q._id !== question._id && !q.isNew);
+        return [...filtered, { ...savedQuestion, isEditing: false }];
+      });
+    } catch (error) {
+      console.error("Error saving question:", error);
     }
-
-    // Replace or add the saved question in the state
-    setQuestions((prev) => {
-      const filtered = prev.filter((q) => q._id !== question._id && !q.isNew);
-      return [...filtered, { ...savedQuestion, isEditing: false }];
-    });
-  } catch (error) {
-    console.error("Error saving question:", error);
-  }
-};
-
+  };
 
   const totalPoints = questions.reduce((sum, q) => sum + (q.points || 0), 0);
 
@@ -103,7 +111,9 @@ const QuizQuestions: React.FC<{ quizId: string }> = ({ quizId }) => {
           <Form.Label>Title</Form.Label>
           <Form.Control
             value={question.title}
-            onChange={(e) => updateQuestion(question._id, { title: e.target.value })}
+            onChange={(e) =>
+              updateQuestion(question._id, { title: e.target.value })
+            }
           />
         </Form.Group>
 
@@ -113,7 +123,9 @@ const QuizQuestions: React.FC<{ quizId: string }> = ({ quizId }) => {
             type="number"
             value={question.points}
             onChange={(e) =>
-              updateQuestion(question._id, { points: parseInt(e.target.value) || 0 })
+              updateQuestion(question._id, {
+                points: parseInt(e.target.value) || 0,
+              })
             }
           />
         </Form.Group>
@@ -141,7 +153,9 @@ const QuizQuestions: React.FC<{ quizId: string }> = ({ quizId }) => {
           <Form.Control
             as="textarea"
             value={question.text}
-            onChange={(e) => updateQuestion(question._id, { text: e.target.value })}
+            onChange={(e) =>
+              updateQuestion(question._id, { text: e.target.value })
+            }
             rows={3}
           />
         </Form.Group>
@@ -156,7 +170,9 @@ const QuizQuestions: React.FC<{ quizId: string }> = ({ quizId }) => {
                     type="radio"
                     name={`correct-${index}`}
                     checked={question.correctAnswer === choice}
-                    onChange={() => updateQuestion(question._id, { correctAnswer: choice })}
+                    onChange={() =>
+                      updateQuestion(question._id, { correctAnswer: choice })
+                    }
                   />
                 </Col>
                 <Col xs={10}>
@@ -174,7 +190,9 @@ const QuizQuestions: React.FC<{ quizId: string }> = ({ quizId }) => {
                     size="sm"
                     variant="danger"
                     onClick={() => {
-                      const filtered = (question.choices ?? []).filter((_, i) => i !== idx);
+                      const filtered = (question.choices ?? []).filter(
+                        (_, i) => i !== idx
+                      );
                       updateQuestion(question._id, { choices: filtered });
                     }}
                     disabled={(question.choices?.length ?? 0) <= 2}
@@ -205,14 +223,18 @@ const QuizQuestions: React.FC<{ quizId: string }> = ({ quizId }) => {
               label="True"
               type="radio"
               checked={question.correctAnswer === true}
-              onChange={() => updateQuestion(question._id, { correctAnswer: true })}
+              onChange={() =>
+                updateQuestion(question._id, { correctAnswer: true })
+              }
             />
             <Form.Check
               inline
               label="False"
               type="radio"
               checked={question.correctAnswer === false}
-              onChange={() => updateQuestion(question._id, { correctAnswer: false })}
+              onChange={() =>
+                updateQuestion(question._id, { correctAnswer: false })
+              }
             />
           </Form.Group>
         )}
@@ -226,9 +248,13 @@ const QuizQuestions: React.FC<{ quizId: string }> = ({ quizId }) => {
                     <Form.Control
                       value={ans}
                       onChange={(e) => {
-                        const updated = [...(question.correctAnswer as string[])];
+                        const updated = [
+                          ...(question.correctAnswer as string[]),
+                        ];
                         updated[idx] = e.target.value;
-                        updateQuestion(question._id, { correctAnswer: updated });
+                        updateQuestion(question._id, {
+                          correctAnswer: updated,
+                        });
                       }}
                     />
                   </Col>
@@ -237,10 +263,12 @@ const QuizQuestions: React.FC<{ quizId: string }> = ({ quizId }) => {
                       variant="danger"
                       size="sm"
                       onClick={() => {
-                        const updated = (question.correctAnswer as string[]).filter(
-                          (_, i) => i !== idx
-                        );
-                        updateQuestion(question._id, { correctAnswer: updated });
+                        const updated = (
+                          question.correctAnswer as string[]
+                        ).filter((_, i) => i !== idx);
+                        updateQuestion(question._id, {
+                          correctAnswer: updated,
+                        });
                       }}
                     >
                       ×
@@ -253,7 +281,10 @@ const QuizQuestions: React.FC<{ quizId: string }> = ({ quizId }) => {
                 variant="secondary"
                 onClick={() =>
                   updateQuestion(question._id, {
-                    correctAnswer: [...(question.correctAnswer as string[]), ""],
+                    correctAnswer: [
+                      ...(question.correctAnswer as string[]),
+                      "",
+                    ],
                   })
                 }
               >
@@ -269,7 +300,10 @@ const QuizQuestions: React.FC<{ quizId: string }> = ({ quizId }) => {
           <Button variant="primary" onClick={() => saveEdit(question)}>
             Save
           </Button>
-          <Button variant="outline-danger" onClick={() => deleteQuestion(question)}>
+          <Button
+            variant="outline-danger"
+            onClick={() => deleteQuestion(question)}
+          >
             Delete
           </Button>
         </div>
@@ -281,7 +315,9 @@ const QuizQuestions: React.FC<{ quizId: string }> = ({ quizId }) => {
     <Card className="mb-3" key={q._id ?? `new-${index}`}>
       <Card.Body>
         <h5>{q.title}</h5>
-        <p><b>{q.text}</b></p>
+        <p>
+          <b>{q.text}</b>
+        </p>
         <p>Points: {q.points}</p>
         {q.type === "Multiple Choice" && (
           <ul>
@@ -293,7 +329,9 @@ const QuizQuestions: React.FC<{ quizId: string }> = ({ quizId }) => {
           </ul>
         )}
         {q.type === "True/False" && (
-          <p>Answer: <b>{q.correctAnswer ? "True" : "False"}</b></p>
+          <p>
+            Answer: <b>{q.correctAnswer ? "True" : "False"}</b>
+          </p>
         )}
         {q.type === "Fill in the Blank" && (
           <p>Answers: {(q.correctAnswer as string[])?.join(", ")}</p>

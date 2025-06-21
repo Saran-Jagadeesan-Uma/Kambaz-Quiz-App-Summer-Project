@@ -41,36 +41,68 @@ export default function QuizDetails() {
       <Card className="mb-3">
         <Card.Body>
           <Row>
-            <Col md={6}><b>Due Date:</b> {formatDate(quiz.dueDate)}</Col>
-            <Col md={6}><b>Points:</b> {quiz.points}</Col>
+            <Col md={6}>
+              <b>Due Date:</b> {formatDate(quiz.dueDate)}
+            </Col>
+            <Col md={6}>
+              <b>Points:</b> {quiz.points}
+            </Col>
           </Row>
           <Row>
-            <Col md={6}><b>Available From:</b> {formatDate(quiz.availableFrom)}</Col>
-            <Col md={6}><b>Available Until:</b> {formatDate(quiz.availableUntil)}</Col>
+            <Col md={6}>
+              <b>Available From:</b> {formatDate(quiz.availableFrom)}
+            </Col>
+            <Col md={6}>
+              <b>Available Until:</b> {formatDate(quiz.availableUntil)}
+            </Col>
           </Row>
 
           {isFaculty && (
             <>
               <hr />
               <Row>
-                <Col md={6}><b>Quiz Type:</b> {quiz.quizType}</Col>
-                <Col md={6}><b>Assignment Group:</b> {quiz.assignmentGroup}</Col>
+                <Col md={6}>
+                  <b>Quiz Type:</b> {quiz.quizType}
+                </Col>
+                <Col md={6}>
+                  <b>Assignment Group:</b> {quiz.assignmentGroup}
+                </Col>
               </Row>
               <Row>
-                <Col md={6}><b>Shuffle Answers:</b> {quiz.shuffleAnswers ? "Yes" : "No"}</Col>
-                <Col md={6}><b>Time Limit:</b> {quiz.timeLimit} mins</Col>
+                <Col md={6}>
+                  <b>Shuffle Answers:</b> {quiz.shuffleAnswers ? "Yes" : "No"}
+                </Col>
+                <Col md={6}>
+                  <b>Time Limit:</b> {quiz.timeLimit} mins
+                </Col>
               </Row>
               <Row>
-                <Col md={6}><b>Multiple Attempts:</b> {quiz.multipleAttempts ? `Yes (${quiz.maxAttempts})` : "No"}</Col>
-                <Col md={6}><b>Show Correct Answers:</b> {quiz.showCorrectAnswers ? "Yes" : "No"}</Col>
+                <Col md={6}>
+                  <b>Multiple Attempts:</b>{" "}
+                  {quiz.multipleAttempts ? `Yes (${quiz.maxAttempts})` : "No"}
+                </Col>
+                <Col md={6}>
+                  <b>Show Correct Answers:</b>{" "}
+                  {quiz.showCorrectAnswers ? "Yes" : "No"}
+                </Col>
               </Row>
               <Row>
-                <Col md={6}><b>Access Code:</b> {quiz.accessCode || "None"}</Col>
-                <Col md={6}><b>One Question at a Time:</b> {quiz.oneQuestionAtATime ? "Yes" : "No"}</Col>
+                <Col md={6}>
+                  <b>Access Code:</b> {quiz.accessCode || "None"}
+                </Col>
+                <Col md={6}>
+                  <b>One Question at a Time:</b>{" "}
+                  {quiz.oneQuestionAtATime ? "Yes" : "No"}
+                </Col>
               </Row>
               <Row>
-                <Col md={6}><b>Webcam Required:</b> {quiz.webcamRequired ? "Yes" : "No"}</Col>
-                <Col md={6}><b>Lock After Answering:</b> {quiz.lockQuestionsAfterAnswering ? "Yes" : "No"}</Col>
+                <Col md={6}>
+                  <b>Webcam Required:</b> {quiz.webcamRequired ? "Yes" : "No"}
+                </Col>
+                <Col md={6}>
+                  <b>Lock After Answering:</b>{" "}
+                  {quiz.lockQuestionsAfterAnswering ? "Yes" : "No"}
+                </Col>
               </Row>
             </>
           )}
@@ -82,13 +114,17 @@ export default function QuizDetails() {
           <>
             <Button
               variant="secondary"
-              onClick={() => navigate(`/Kambaz/Courses/${cid}/Quizzes/${quizId}/edit`)}
+              onClick={() =>
+                navigate(`/Kambaz/Courses/${cid}/Quizzes/${quizId}/edit`)
+              }
             >
               Edit
             </Button>
             <Button
               variant="info"
-              onClick={() => navigate(`/Kambaz/Courses/${cid}/Quizzes/${quizId}/preview`)}
+              onClick={() =>
+                navigate(`/Kambaz/Courses/${cid}/Quizzes/${quizId}/preview`)
+              }
             >
               Preview
             </Button>
@@ -97,12 +133,14 @@ export default function QuizDetails() {
         {isStudent && (
           <Button
             variant="primary"
-            onClick={() => navigate(`/Kambaz/Courses/${cid}/Quizzes/${quizId}/take`)}
+            onClick={() =>
+              navigate(`/Kambaz/Courses/${cid}/Quizzes/${quizId}/take`)
+            }
           >
             Start Quiz
           </Button>
         )}
-      </div>  
+      </div>
     </div>
   );
 }

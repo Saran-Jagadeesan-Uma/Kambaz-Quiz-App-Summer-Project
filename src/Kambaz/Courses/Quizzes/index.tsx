@@ -112,14 +112,17 @@ export default function Quizzes() {
                         className="d-block text-primary text-decoration-none"
                         role="button"
                         onClick={() =>
-                          navigate(`/Kambaz/Courses/${courseId}/Quizzes/${quiz._id}`)
+                          navigate(
+                            `/Kambaz/Courses/${courseId}/Quizzes/${quiz._id}`
+                          )
                         }
                       >
                         {quiz.title}
                       </b>
                       <div className="text-secondary small">
-                        {getAvailability(quiz)} | Due {formatDate(quiz.dueDate)} |{" "}
-                        {quiz.points} pts | {quiz.questions?.length ?? 0} questions
+                        {getAvailability(quiz)} | Due {formatDate(quiz.dueDate)}{" "}
+                        | {quiz.points} pts | {quiz.questions?.length ?? 0}{" "}
+                        questions
                         {isStudent && quiz.score !== undefined
                           ? ` | Score: ${quiz.score}`
                           : ""}

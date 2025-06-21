@@ -2,14 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import * as client from "./client";
 import QuizQuestions from "./Questions/questions";
-import {
-  Form,
-  Button,
-  Row,
-  Col,
-  Tabs,
-  Tab,
-} from "react-bootstrap";
+import { Form, Button, Row, Col, Tabs, Tab } from "react-bootstrap";
 
 export default function QuizEditor() {
   const { quizId, cid } = useParams();
@@ -217,9 +210,7 @@ export default function QuizEditor() {
               type="switch"
               label="Webcam Required"
               checked={quiz.webcamRequired}
-              onChange={(e) =>
-                handleChange("webcamRequired", e.target.checked)
-              }
+              onChange={(e) => handleChange("webcamRequired", e.target.checked)}
             />
 
             <Form.Check
@@ -245,7 +236,9 @@ export default function QuizEditor() {
                 <Form.Control
                   type="date"
                   value={quiz.availableFrom?.substring(0, 10) || ""}
-                  onChange={(e) => handleChange("availableFrom", e.target.value)}
+                  onChange={(e) =>
+                    handleChange("availableFrom", e.target.value)
+                  }
                 />
               </Col>
               <Col md={4}>
@@ -253,7 +246,9 @@ export default function QuizEditor() {
                 <Form.Control
                   type="date"
                   value={quiz.availableUntil?.substring(0, 10) || ""}
-                  onChange={(e) => handleChange("availableUntil", e.target.value)}
+                  onChange={(e) =>
+                    handleChange("availableUntil", e.target.value)
+                  }
                 />
               </Col>
             </Row>
@@ -263,7 +258,6 @@ export default function QuizEditor() {
         <Tab eventKey="questions" title="Questions">
           <QuizQuestions quizId={quizId!} />
         </Tab>
-
       </Tabs>
 
       <div className="d-flex gap-2 mt-3">

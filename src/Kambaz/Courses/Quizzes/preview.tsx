@@ -87,23 +87,35 @@ export default function QuizPreview() {
           <h3>{quiz.title}</h3>
           <p>{quiz.description}</p>
         </div>
-        <Button variant="outline-primary" onClick={() => navigate(`/Kambaz/Courses/${cid}/Quizzes/${quizId}`)}>
+        <Button
+          variant="outline-primary"
+          onClick={() => navigate(`/Kambaz/Courses/${cid}/Quizzes/${quizId}`)}
+        >
           Back to details
         </Button>
       </div>
 
       {submitted && (
         <Alert variant="info">
-          Your Score: <strong>{score} / {questions.reduce((sum, q) => sum + q.points, 0)}</strong>
+          Your Score:{" "}
+          <strong>
+            {score} / {questions.reduce((sum, q) => sum + q.points, 0)}
+          </strong>
         </Alert>
       )}
 
       {questions.map((q, idx) => (
         <Card className="mb-3" key={q._id}>
           <Card.Body>
-            <h5>{idx + 1}. {q.title}</h5>
-            <p><i>{q.text}</i></p>
-            <p><b>{q.points} points</b></p>
+            <h5>
+              {idx + 1}. {q.title}
+            </h5>
+            <p>
+              <i>{q.text}</i>
+            </p>
+            <p>
+              <b>{q.points} points</b>
+            </p>
 
             {q.type === "Multiple Choice" && q.choices && (
               <Form>

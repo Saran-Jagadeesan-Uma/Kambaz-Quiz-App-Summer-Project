@@ -49,7 +49,7 @@ export const findQuizById = async (qid: string): Promise<Quiz> => {
 };
 
 export const createQuiz = async (cid: string, quiz: Quiz): Promise<Quiz> => {
-  const payload = { ...quiz, course: cid };  // ✅ Ensuring course is set
+  const payload = { ...quiz, course: cid };
   const { data } = await axiosWithCredentials.post(
     `${COURSES_URL}/${cid}/quizzes`,
     payload
@@ -85,10 +85,7 @@ export const getAttemptsForStudent = async (
     .get(`${QUIZZES_URL}/${quizId}/attempts/${studentId}`)
     .then((res) => res.data);
 
-export const getAttemptCount = async (
-  quizId: string,
-  studentId: string
-) =>
+export const getAttemptCount = async (quizId: string, studentId: string) =>
   axiosWithCredentials
     .get(`${QUIZZES_URL}/${quizId}/attempts/${studentId}/count`)
     .then((res) => res.data.count);
