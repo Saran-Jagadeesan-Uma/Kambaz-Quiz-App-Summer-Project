@@ -26,12 +26,34 @@ export default function QuizDetails() {
     fetchQuiz();
   }, [quizId]);
 
-  if (!quiz) return <div>Loading quiz...</div>;
-
   const formatDate = (date?: string) => {
     if (!date) return "Not set";
     return new Date(date).toLocaleString();
   };
+
+  const handleUnpublish = async () => {
+    if (!quiz?._id) return;
+    try {
+      const updated = { ...quiz, published: false };
+      await client.updateQuiz(quiz._id, updated);
+      setQuiz(updated);
+    } catch (e) {
+      console.error("Failed to unpublish quiz", e);
+    }
+  };
+
+  const handlePublish = async () => {
+    if (!quiz?._id) return;
+    try {
+      const updated = { ...quiz, published: true };
+      await client.updateQuiz(quiz._id, updated);
+      setQuiz(updated);
+    } catch (e) {
+      console.error("Failed to publish quiz", e);
+    }
+  };
+
+  if (!quiz) return <div>Loading quiz...</div>;
 
   return (
     <div className="p-4">
@@ -128,6 +150,15 @@ export default function QuizDetails() {
             >
               Preview
             </Button>
+            {quiz.published ? (
+              <Button variant="danger" onClick={handleUnpublish}>
+                Unpublish Quiz
+              </Button>
+            ) : (
+              <Button variant="success" onClick={handlePublish}>
+                Publish Quiz
+              </Button>
+            )}
           </>
         )}
         {isStudent && (

@@ -11,7 +11,6 @@ export default function QuizEditor() {
 
   const [quiz, setQuiz] = useState<client.Quiz>({
     title: "New Quiz",
-
     description: "",
     dueDate: "",
     availableFrom: "",
@@ -46,19 +45,19 @@ export default function QuizEditor() {
     setQuiz((prev) => ({ ...prev, [field]: value }));
   };
 
-  const save = async (publish: boolean = false) => {
+  const save = async (publishState?: boolean) => {
     if (!cid) return;
     try {
       const { questions, ...quizWithoutQuestions } = quiz;
       const payload = {
         ...quizWithoutQuestions,
-        published: publish || quiz.published,
+        published: publishState ?? quiz.published,
       };
 
       if (isNew) {
         await client.createQuiz(cid, payload);
       } else {
-        await client.updateQuiz(quizId!, payload); // no question overwrite
+        await client.updateQuiz(quizId!, payload);
       }
 
       navigate(`/Kambaz/Courses/${cid}/Quizzes`);
@@ -144,18 +143,26 @@ export default function QuizEditor() {
                   />
                 </Form.Group>
               </Col>
-              <Col md={6}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Time Limit (minutes)</Form.Label>
-                  <Form.Control
-                    type="number"
-                    value={quiz.timeLimit}
-                    onChange={(e) =>
-                      handleChange("timeLimit", parseInt(e.target.value) || 0)
-                    }
-                  />
-                </Form.Group>
-              </Col>
+              <Form.Check
+                type="switch"
+                id="time-limit-toggle"
+                label="Set Time Limit"
+                checked={(quiz.timeLimit ?? 0) > 0}
+                onChange={(e) =>
+                  handleChange("timeLimit", e.target.checked ? 20 : 0)
+                }
+              />
+
+              {(quiz.timeLimit ?? 0) > 0 && (
+                <Form.Control
+                  type="number"
+                  className="mt-2"
+                  value={quiz.timeLimit ?? 1}
+                  onChange={(e) =>
+                    handleChange("timeLimit", parseInt(e.target.value) || 1)
+                  }
+                />
+              )}
             </Row>
 
             <Form.Check
@@ -268,11 +275,14 @@ export default function QuizEditor() {
       </Tabs>
 
       <div className="d-flex gap-2 mt-3">
-        <Button variant="primary" onClick={() => save(false)}>
+        <Button variant="primary" onClick={() => save(undefined)}>
           Save
         </Button>
-        <Button variant="success" onClick={() => save(true)}>
-          Save and Publish
+        <Button
+          variant={quiz.published ? "warning" : "success"}
+          onClick={() => save(!quiz.published)}
+        >
+          {quiz.published ? "Save and Unpublish" : "Save and Publish"}
         </Button>
         <Button variant="secondary" onClick={cancel}>
           Cancel
