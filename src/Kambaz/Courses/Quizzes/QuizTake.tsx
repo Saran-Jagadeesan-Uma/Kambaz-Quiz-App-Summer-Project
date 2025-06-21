@@ -99,12 +99,20 @@ export default function QuizTake() {
     for (const q of questions) {
       const given = answers[q._id];
       let correct = false;
+
       if (q.type === "True/False" || q.type === "Multiple Choice") {
         correct = given === q.correctAnswer;
       } else if (q.type === "Fill in the Blank") {
-        correct = (q.correctAnswer as string[])?.some(
-          (a: string) => a.toLowerCase().trim() === given?.toLowerCase().trim()
-        );
+        if (Array.isArray(q.correctAnswer)) {
+          correct =
+            Array.isArray(given) &&
+            given.length === q.correctAnswer.length &&
+            given.every(
+              (ans, i) =>
+                ans?.toLowerCase().trim() ===
+                (q.correctAnswer as string[])[i]?.toLowerCase().trim()
+            );
+        }
       }
 
       result.answers.push({ question: q._id, selected: given, correct });
@@ -196,15 +204,22 @@ export default function QuizTake() {
                 </>
               )}
 
-              {currentQuestion.type === "Fill in the Blank" && (
-                <Form.Control
-                  type="text"
-                  value={answers[currentQuestion._id] || ""}
-                  onChange={(e) =>
-                    handleChange(currentQuestion._id, e.target.value)
-                  }
-                />
-              )}
+              {currentQuestion.type === "Fill in the Blank" &&
+                Array.isArray(currentQuestion.correctAnswer) &&
+                currentQuestion.correctAnswer.map((_, idx) => (
+                  <Form.Control
+                    key={idx}
+                    className="mb-2"
+                    type="text"
+                    placeholder={`Blank ${idx + 1}`}
+                    value={answers[currentQuestion._id]?.[idx] || ""}
+                    onChange={(e) => {
+                      const currentAnswers = answers[currentQuestion._id] || [];
+                      currentAnswers[idx] = e.target.value;
+                      handleChange(currentQuestion._id, [...currentAnswers]);
+                    }}
+                  />
+                ))}
             </Card.Body>
           </Card>
 
@@ -241,13 +256,20 @@ export default function QuizTake() {
           {questions.map((q) => {
             const selected = answers[q._id];
             let correct = false;
+
             if (q.type === "True/False" || q.type === "Multiple Choice") {
               correct = selected === q.correctAnswer;
-            } else {
-              correct = (q.correctAnswer as string[])?.some(
-                (a: string) =>
-                  a.toLowerCase().trim() === selected?.toLowerCase().trim()
-              );
+            } else if (q.type === "Fill in the Blank") {
+              if (Array.isArray(q.correctAnswer)) {
+                correct =
+                  Array.isArray(selected) &&
+                  selected.length === q.correctAnswer.length &&
+                  selected.every(
+                    (ans, i) =>
+                      ans?.toLowerCase().trim() ===
+                      (q.correctAnswer as string[])[i]?.toLowerCase().trim()
+                  );
+              }
             }
 
             return (
@@ -258,14 +280,17 @@ export default function QuizTake() {
                   </Card.Title>
                   <Card.Text>{q.text}</Card.Text>
                   <p>
-                    <b>Your Answer:</b> {selected?.toString()}
+                    <b>Your Answer:</b>{" "}
+                    {Array.isArray(selected)
+                      ? selected.join(", ")
+                      : selected?.toString()}
                   </p>
                   {!correct && (
                     <p>
                       <b>Correct Answer:</b>{" "}
                       {Array.isArray(q.correctAnswer)
                         ? q.correctAnswer.join(", ")
-                        : (q.correctAnswer ?? "").toString()}
+                        : q.correctAnswer?.toString()}
                     </p>
                   )}
                 </Card.Body>
@@ -275,8 +300,8 @@ export default function QuizTake() {
 
           {attemptsLeft > 0 && (
             <Button variant="primary" onClick={resetQuiz}>
-              Retake Quiz ({attemptsLeft} attempt{attemptsLeft > 1 ? "s" : ""}{" "}
-              left)
+              Retake Quiz ({attemptsLeft} attempt
+              {attemptsLeft > 1 ? "s" : ""} left)
             </Button>
           )}
           {attemptsLeft <= 0 && (
@@ -306,7 +331,10 @@ export default function QuizTake() {
                   return (
                     <div key={i} className="mt-2">
                       <b>{question.title}:</b> Your answer:{" "}
-                      {ans.selected?.toString()} — {ans.correct ? "✔" : "❌"}
+                      {Array.isArray(ans.selected)
+                        ? ans.selected.join(", ")
+                        : ans.selected?.toString()}{" "}
+                      — {ans.correct ? "✔" : "❌"}
                       {!ans.correct && (
                         <div>
                           Correct answer:{" "}
