@@ -26,7 +26,12 @@ export default function Quizzes() {
     if (courseId) {
       const data = await client.findQuizzesForCourse(courseId);
       const filtered = isStudent ? data.filter((q) => q.published) : data;
-      setQuizzes(filtered);
+      const sorted = [...filtered].sort((a, b) => {
+        const dateA = a.availableFrom ? new Date(a.availableFrom).getTime() : 0;
+        const dateB = b.availableFrom ? new Date(b.availableFrom).getTime() : 0;
+        return dateA - dateB;
+      });
+      setQuizzes(sorted);
     }
   };
 
@@ -54,7 +59,8 @@ export default function Quizzes() {
     const from = quiz.availableFrom ? new Date(quiz.availableFrom) : null;
     const until = quiz.availableUntil ? new Date(quiz.availableUntil) : null;
 
-    if (from && now < from) return `Not available until ${from.toLocaleDateString()}`;
+    if (from && now < from)
+      return `Not available until ${from.toLocaleDateString()}`;
     if (until && now > until) return "Closed";
     if (from && until && now >= from && now <= until) return "Available";
     return "Availability unknown";
@@ -65,7 +71,9 @@ export default function Quizzes() {
 
   const handleStudentQuizClick = (quiz: client.Quiz) => {
     const now = new Date();
-    const availableFrom = quiz.availableFrom ? new Date(quiz.availableFrom) : null;
+    const availableFrom = quiz.availableFrom
+      ? new Date(quiz.availableFrom)
+      : null;
 
     if (availableFrom && now < availableFrom) {
       const diffDays = Math.ceil(
@@ -88,7 +96,9 @@ export default function Quizzes() {
         {isFaculty && (
           <button
             className="btn btn-success"
-            onClick={() => navigate(`/Kambaz/Courses/${courseId}/Quizzes/new/edit`)}
+            onClick={() =>
+              navigate(`/Kambaz/Courses/${courseId}/Quizzes/new/edit`)
+            }
           >
             + Add Quiz
           </button>
@@ -107,7 +117,7 @@ export default function Quizzes() {
           <ListGroup className="wd-lessons rounded-0">
             {quizzes.length === 0 ? (
               <ListGroup.Item className="p-3 text-muted">
-                No quizzes yet. {isFaculty && '+ Add Quiz to begin.'}
+                No quizzes yet. {isFaculty && "+ Add Quiz to begin."}
               </ListGroup.Item>
             ) : (
               quizzes.map((quiz) => (
@@ -126,14 +136,17 @@ export default function Quizzes() {
                         onClick={() =>
                           isStudent
                             ? handleStudentQuizClick(quiz)
-                            : navigate(`/Kambaz/Courses/${courseId}/Quizzes/${quiz._id}`)
+                            : navigate(
+                                `/Kambaz/Courses/${courseId}/Quizzes/${quiz._id}`
+                              )
                         }
                       >
                         {quiz.title}
                       </b>
                       <div className="text-secondary small">
-                        {getAvailability(quiz)} | Due {formatDate(quiz.dueDate)} |{" "}
-                        {quiz.points} pts | {quiz.questions?.length ?? 0} questions
+                        {getAvailability(quiz)} | Due {formatDate(quiz.dueDate)}{" "}
+                        | {quiz.points} pts | {quiz.questions?.length ?? 0}{" "}
+                        questions
                       </div>
                     </Col>
                     {isFaculty && (
@@ -174,7 +187,9 @@ export default function Quizzes() {
                           <Dropdown.Menu>
                             <Dropdown.Item
                               onClick={() =>
-                                navigate(`/Kambaz/Courses/${courseId}/Quizzes/${quiz._id}/edit`)
+                                navigate(
+                                  `/Kambaz/Courses/${courseId}/Quizzes/${quiz._id}/edit`
+                                )
                               }
                             >
                               Edit
