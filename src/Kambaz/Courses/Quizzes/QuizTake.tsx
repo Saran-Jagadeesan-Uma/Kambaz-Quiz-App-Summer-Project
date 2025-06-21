@@ -116,7 +116,10 @@ export default function QuizTake() {
     setScore(saved.score);
     setSubmitted(true);
 
-    const attempts = await client.getAttemptsForStudent(quiz, currentUser._id);
+    const attempts = await client.getAttemptsForStudent(
+      quiz._id || quizId,
+      currentUser._id
+    );
     setPreviousAttempts(attempts || []);
 
     if (quiz.multipleAttempts && currentUser?._id) {
@@ -138,6 +141,7 @@ export default function QuizTake() {
   };
 
   const currentQuestion = questions[currentIndex];
+  const totalPossiblePoints = questions.reduce((sum, q) => sum + q.points, 0);
 
   if (!quiz || questions.length === 0) return <p>Loading quiz...</p>;
 
@@ -231,7 +235,7 @@ export default function QuizTake() {
         <>
           <h4>Quiz Submitted!</h4>
           <p>
-            Your Score: {score} / {quiz.points}
+            Your Score: {score} / {totalPossiblePoints}
           </p>
 
           {questions.map((q) => {
