@@ -5,12 +5,11 @@ const axiosWithCredentials = axios.create({ withCredentials: true });
 const REMOTE_SERVER = import.meta.env.VITE_REMOTE_SERVER;
 const QUESTIONS_API = `${REMOTE_SERVER}/api/questions`;
 
-export const createQuestion = async (question: any) => {
+export const createQuestion = async (quizId: string, question: any) => {
   try {
-    const { quizId, ...rest } = question;
     const { data } = await axiosWithCredentials.post(
       `${REMOTE_SERVER}/api/quizzes/${quizId}/questions`,
-      rest
+      question
     );
     return data;
   } catch (error) {

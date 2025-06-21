@@ -74,20 +74,25 @@ const QuizQuestions: React.FC<{ quizId: string }> = ({ quizId }) => {
   };
 
   const saveEdit = async (question: Question) => {
-    try {
-      const updated = question.isNew
-        ? await questionClient.createQuestion(question)
-        : await questionClient.updateQuestion(question);
+  try {
+    let savedQuestion;
 
-      setQuestions((prev) =>
-        prev.map((q) =>
-          q === question || q._id === question._id ? { ...updated, isEditing: false } : q
-        )
-      );
-    } catch (error) {
-      console.error("Error saving question:", error);
+    if (question.isNew) {
+      savedQuestion = await questionClient.createQuestion(quizId, question);
+    } else {
+      savedQuestion = await questionClient.updateQuestion(question);
     }
-  };
+
+    // Replace or add the saved question in the state
+    setQuestions((prev) => {
+      const filtered = prev.filter((q) => q._id !== question._id && !q.isNew);
+      return [...filtered, { ...savedQuestion, isEditing: false }];
+    });
+  } catch (error) {
+    console.error("Error saving question:", error);
+  }
+};
+
 
   const totalPoints = questions.reduce((sum, q) => sum + (q.points || 0), 0);
 
