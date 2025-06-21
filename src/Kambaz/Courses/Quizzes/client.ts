@@ -1,7 +1,6 @@
 import axios from "axios";
 
 const axiosWithCredentials = axios.create({ withCredentials: true });
-
 export const REMOTE_SERVER = import.meta.env.VITE_REMOTE_SERVER;
 export const QUIZZES_URL = `${REMOTE_SERVER}/api/quizzes`;
 export const COURSES_URL = `${REMOTE_SERVER}/api/courses`;
@@ -29,15 +28,13 @@ export interface Quiz {
   webcamRequired?: boolean;
   lockQuestionsAfterAnswering?: boolean;
   questions?: string[];
-  score?: number; 
+  score?: number;
 }
-
 
 export const findAllQuizzes = async (): Promise<Quiz[]> => {
   const { data } = await axiosWithCredentials.get(QUIZZES_URL);
   return data;
 };
-
 
 export const findQuizzesForCourse = async (cid: string): Promise<Quiz[]> => {
   const { data } = await axiosWithCredentials.get(
@@ -46,21 +43,19 @@ export const findQuizzesForCourse = async (cid: string): Promise<Quiz[]> => {
   return data;
 };
 
-
 export const findQuizById = async (qid: string): Promise<Quiz> => {
   const { data } = await axiosWithCredentials.get(`${QUIZZES_URL}/${qid}`);
   return data;
 };
 
-
 export const createQuiz = async (cid: string, quiz: Quiz): Promise<Quiz> => {
+  const payload = { ...quiz, course: cid };  // ✅ Ensuring course is set
   const { data } = await axiosWithCredentials.post(
     `${COURSES_URL}/${cid}/quizzes`,
-    quiz
+    payload
   );
   return data;
 };
-
 
 export const updateQuiz = async (
   qid: string,
@@ -73,7 +68,27 @@ export const updateQuiz = async (
   return data;
 };
 
-
 export const deleteQuiz = async (qid: string): Promise<void> => {
   await axiosWithCredentials.delete(`${QUIZZES_URL}/${qid}`);
 };
+
+export const submitAttempt = async (quizId: string, attempt: any) =>
+  axiosWithCredentials
+    .post(`${QUIZZES_URL}/${quizId}/attempts`, attempt)
+    .then((res) => res.data);
+
+export const getAttemptsForStudent = async (
+  quizId: string,
+  studentId: string
+) =>
+  axiosWithCredentials
+    .get(`${QUIZZES_URL}/${quizId}/attempts/${studentId}`)
+    .then((res) => res.data);
+
+export const getAttemptCount = async (
+  quizId: string,
+  studentId: string
+) =>
+  axiosWithCredentials
+    .get(`${QUIZZES_URL}/${quizId}/attempts/${studentId}/count`)
+    .then((res) => res.data.count);

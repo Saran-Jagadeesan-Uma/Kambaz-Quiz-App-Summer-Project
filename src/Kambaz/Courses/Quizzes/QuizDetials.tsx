@@ -80,16 +80,25 @@ export default function QuizDetails() {
       <div className="d-flex gap-2">
         {isFaculty && (
           <>
-            <Button variant="secondary" onClick={() => navigate(`/Kambaz/Courses/${cid}/Quizzes/${quizId}/edit`)}>
+            <Button
+              variant="secondary"
+              onClick={() => navigate(`/Kambaz/Courses/${cid}/Quizzes/${quizId}/edit`)}
+            >
               Edit
             </Button>
-            <Button variant="info" onClick={() => navigate(`/Kambaz/Courses/${cid}/Quizzes/${quizId}/preview`)}>
+            <Button
+              variant="info"
+              onClick={() => navigate(`/Kambaz/Courses/${cid}/Quizzes/${quizId}/preview`)}
+            >
               Preview
             </Button>
           </>
         )}
         {isStudent && (
-          <Button variant="primary" onClick={() => alert("Quiz start coming soon!")}>
+          <Button
+            variant="primary"
+            onClick={() => navigate(`/Kambaz/Courses/${cid}/Quizzes/${quizId}/take`)}
+          >
             Start Quiz
           </Button>
         )}

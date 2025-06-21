@@ -73,8 +73,8 @@ export default function Quizzes() {
         <button
           className="btn btn-success"
           onClick={() =>
-            navigate(`/Kambaz/Courses/${courseId}/Quizzes/new`)
-          }
+            navigate(`/Kambaz/Courses/${courseId}/Quizzes/new/edit`)
+                    }
         >
           + Add Quiz
         </button>

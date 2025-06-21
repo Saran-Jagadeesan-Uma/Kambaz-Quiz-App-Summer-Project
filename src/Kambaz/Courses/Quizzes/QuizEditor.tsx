@@ -62,7 +62,7 @@ export default function QuizEditor() {
         await client.updateQuiz(quizId!, payload);
       }
       const target = publish ? "Quizzes" : `Quizzes/${quizId}`;
-      navigate(`/Kambaz/Courses/${cid}/${target}`);
+      navigate(`/Kambaz/Courses/${cid}/Quizzes`);
     } catch (err) {
       console.error("Error saving quiz:", err);
     }
